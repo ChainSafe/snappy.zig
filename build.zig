@@ -47,20 +47,17 @@ pub fn build(b: *std.Build) void {
     lib.addIncludePath(upstream.path("."));
     lib.addConfigHeader(snappy_stubs_public_h);
 
-    const install_lib = b.addInstallArtifact(lib, .{});
-    install_lib.artifact.installHeader(upstream.path("snappy.h"), "snappy.h");
-    install_lib.artifact.installHeader(upstream.path("snappy-c.h"), "snappy-c.h");
-    install_lib.artifact.installHeader(snappy_stubs_public_h.getOutput(), "snappy-stubs-public.h");
-    b.getInstallStep().dependOn(&install_lib.step);
+    lib.installHeader(upstream.path("snappy.h"), "snappy.h");
+    lib.installHeader(upstream.path("snappy-c.h"), "snappy-c.h");
+    lib.installHeader(snappy_stubs_public_h.getOutput(), "snappy-stubs-public.h");
+    b.installArtifact(lib);
 
     const module = b.addModule("snappy", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
     });
-
     module.linkLibrary(lib);
-    module.addIncludePath(upstream.path("."));
 
     const test_snappy = b.addTest(.{
         .name = "snappy",
