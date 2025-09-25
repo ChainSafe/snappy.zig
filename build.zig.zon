@@ -1,0 +1,17 @@
+.{
+    .name = .snappy,
+    .version = "0.1.0",
+    .fingerprint = 0xcbfb5fb8aa1a809f,
+    .minimum_zig_version = "0.14.1",
+    .dependencies = .{
+        .snappy = .{
+            .url = "git+https://github.com/google/snappy#6f99459b5b837fa18abb1be317d3ac868530f384",
+            .hash = "N-V-__8AAGQlMwAN9FGuTgQ6eeGHXgLOoQUSPaBmljRIqfzy",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
