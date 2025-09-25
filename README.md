@@ -8,7 +8,7 @@ A Zig library providing bindings to the Google Snappy compression library. Snapp
 
 ## Usage
 
-1. `zig fetch --save=snappy git+https://github.com/chainsafe/snappy.zig
+1. `zig fetch --save=snappy git+https://github.com/chainsafe/snappy.zig`
 
 2. This dependency includes:
 - the `"snappy"` module - a zig module providing idiomatic zig bindings
