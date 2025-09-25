@@ -12,7 +12,7 @@ A Zig library providing bindings to the Google Snappy compression library. Snapp
 
 2. This dependency includes:
 - the `"snappy"` module - a zig module providing idiomatic zig bindings
-- the `"snappy"` artifact - the upstream snappy shared library and headers
+- the `"snappy"` artifact - the upstream snappy static library and headers
 
 3. In your `build.zig`, add the module:
 
