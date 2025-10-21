@@ -28,6 +28,10 @@ pub fn build(b: *std.Build) void {
             "snappy-c.cc",
         },
         .flags = &[_][]const u8{
+            // optimized version of snappy always compiles with CMAKE_BUILD_TYPE=RelWithDebInfo, which is equivalent to -O2.
+            //
+            // Source: https://github.com/google/snappy/blob/cbea40d40c61c442be7ee0c9695b45ea1b5a3c8c/.github/workflows/build.yml#L82
+            "-O2",
             "-std=c++11",
             "-Wall",
             "-Wextra",
