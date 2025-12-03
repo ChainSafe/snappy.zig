@@ -53,7 +53,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
 
     const module = b.addModule("snappy", .{
-        .root_source_file = b.path("src/root.zig"),
+        .root_source_file = b.path("src/snappy.zig"),
         .target = target,
         .optimize = optimize,
     });

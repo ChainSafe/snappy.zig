@@ -1,5 +1,8 @@
 //! Snappy frame format implementation.
 //!
+//! Snappy frames are not part of the core snappy implementation;
+//! for raw snappy usage, see [raw.zig](./raw.zig).
+//!
 //! Reference: https://github.com/google/snappy/blob/main/framing_format.txt
 
 /// Chunk type tags from the Snappy framing format.
@@ -26,11 +29,11 @@ const UncompressError = error{
     IllegalChunkLength,
 } || snappy.Error || std.mem.Allocator.Error;
 
-const EncodeError = std.mem.Allocator.Error || snappy.Error;
+const CompressError = std.mem.Allocator.Error || snappy.Error;
 
 /// Frame `bytes` into Snappy chunks, choosing compressed payloads only
 /// when they are smaller than their uncompressed counterparts.
-pub fn encode(allocator: std.mem.Allocator, bytes: []const u8) EncodeError![]u8 {
+pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![]u8 {
     var out = std.ArrayList(u8).init(allocator);
     errdefer out.deinit();
     try out.appendSlice(&IDENTIFIER_FRAME);
@@ -124,32 +127,5 @@ test "snappy crc - sanity" {
     try std.testing.expect(crc("snappy") == 0x293d0c23);
 }
 
-test "fixtures" {
-    const allocator = std.testing.allocator;
-
-    var dir = try std.fs.cwd().openDir("testdata", .{ .iterate = true });
-    defer dir.close();
-
-    var it = dir.iterate();
-    while (try it.next()) |entry| {
-        if (entry.kind != .file) continue;
-
-        var file = try dir.openFile(entry.name, .{});
-        defer file.close();
-
-        const bytes = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
-        defer allocator.free(bytes);
-        const d = bytes[0..];
-        const encoded = try encode(allocator, d[0..]);
-        defer allocator.free(encoded);
-        var a = std.ArrayList(u8).init(allocator);
-        defer a.deinit();
-        const got = (try uncompress(encoded, &a)).?;
-        defer allocator.free(got);
-
-        try std.testing.expect(std.mem.eql(u8, bytes, got));
-    }
-}
-
-const snappy = @import("./snappy.zig");
+const snappy = @import("./raw.zig");
 const std = @import("std");
