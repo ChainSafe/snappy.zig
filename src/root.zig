@@ -7,6 +7,6 @@ pub const encode = frame.encode;
 pub const uncompress = frame.uncompress;
 
 test {
-    std.testing.refAllDecls(@import("./snappy.zig"));
-    std.testing.refAllDecls(@import("./frame.zig"));
+    std.testing.refAllDecls(snappy);
+    std.testing.refAllDecls(frame);
 }
