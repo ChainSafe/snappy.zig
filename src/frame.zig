@@ -127,7 +127,7 @@ test "snappy crc - sanity" {
 test "fixtures" {
     const allocator = std.testing.allocator;
 
-    var dir = try std.fs.cwd().openDir("data", .{ .iterate = true });
+    var dir = try std.fs.cwd().openDir("testdata", .{ .iterate = true });
     defer dir.close();
 
     var it = dir.iterate();
