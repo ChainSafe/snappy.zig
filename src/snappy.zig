@@ -39,6 +39,28 @@ test "round trip - raw" {
     }
 }
 
+test "bad data" {
+    const allocator = std.testing.allocator;
+
+    var dir = try std.fs.cwd().openDir("testdata", .{ .iterate = true });
+    defer dir.close();
+
+    var it = dir.iterate();
+    while (try it.next()) |entry| {
+        if (entry.kind != .file) continue;
+        if (!std.mem.startsWith(u8, entry.name, "baddata")) continue;
+
+        var file = try dir.openFile(entry.name, .{});
+        defer file.close();
+
+        const bytes = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
+        defer allocator.free(bytes);
+        const got = try allocator.alloc(u8, try raw.uncompressedLength(bytes));
+        defer allocator.free(got);
+        try std.testing.expectError(raw.Error.invalid_input, raw.uncompress(bytes[0..], got));
+    }
+}
+
 test "round trip - framed" {
     const allocator = std.testing.allocator;
 

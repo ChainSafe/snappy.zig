@@ -23,13 +23,13 @@ const IDENTIFIER_FRAME: [10]u8 = [_]u8{ 0xff, 0x06, 0x00, 0x00, 0x73, 0x4e, 0x61
 /// Max allowed size for an uncompressed payload according to the spec.
 const UNCOMPRESSED_CHUNK_SIZE_LIMIT = 65536;
 
-const UncompressError = error{
+pub const UncompressError = error{
     BadIdentifier,
     BadChecksum,
     IllegalChunkLength,
 } || snappy.Error || std.mem.Allocator.Error;
 
-const CompressError = std.mem.Allocator.Error || snappy.Error;
+pub const CompressError = std.mem.Allocator.Error || snappy.Error;
 
 /// Frame `bytes` into Snappy chunks, choosing compressed payloads only
 /// when they are smaller than their uncompressed counterparts.
