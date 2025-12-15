@@ -33,6 +33,8 @@ pub const CompressError = std.mem.Allocator.Error || snappy.Error;
 
 /// Frame `bytes` into Snappy chunks, choosing compressed payloads only
 /// when they are smaller than their uncompressed counterparts.
+///
+/// Caller owns the returned memory.
 pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![]u8 {
     var out = std.ArrayList(u8).init(allocator);
     errdefer out.deinit();
@@ -70,9 +72,13 @@ pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![
 
 /// Parse framed Snappy data and return the uncompressed payload,
 /// or `null` if the frame explicitly signalled an empty buffer.
-pub fn uncompress(input: []const u8, out: *std.ArrayList(u8)) UncompressError!?[]const u8 {
-    std.debug.assert(input.len > 0);
-    var slice = input;
+///
+/// Caller owns the returned memory.
+pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressError!?[]const u8 {
+    var out = std.ArrayList(u8).init(allocator);
+    errdefer out.deinit();
+    std.debug.assert(bytes.len > 0);
+    var slice = bytes;
 
     while (slice.len > 0) {
         if (slice.len < 4) break;
