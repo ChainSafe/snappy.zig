@@ -79,9 +79,7 @@ test "round trip - framed" {
         const d = bytes[0..];
         const compressed = try frame.compress(allocator, d[0..]);
         defer allocator.free(compressed);
-        var a = std.ArrayList(u8).init(allocator);
-        defer a.deinit();
-        const got = (try frame.uncompress(compressed, &a)).?;
+        const got = (try frame.uncompress(allocator, compressed)).?;
         defer allocator.free(got);
 
         try std.testing.expect(std.mem.eql(u8, bytes, got));
