@@ -70,9 +70,9 @@ pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![
 
 /// Parse framed Snappy data and return the uncompressed payload,
 /// or `null` if the frame explicitly signalled an empty buffer.
-pub fn uncompress(chunk: []const u8, out: *std.ArrayList(u8)) UncompressError!?[]const u8 {
-    std.debug.assert(chunk.len > 0);
-    var slice = chunk;
+pub fn uncompress(input: []const u8, out: *std.ArrayList(u8)) UncompressError!?[]const u8 {
+    std.debug.assert(input.len > 0);
+    var slice = input;
 
     while (slice.len > 0) {
         if (slice.len < 4) break;
