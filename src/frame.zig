@@ -75,10 +75,11 @@ pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![
 ///
 /// Caller owns the returned memory.
 pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressError!?[]const u8 {
-    var out = std.ArrayList(u8).init(allocator);
-    errdefer out.deinit();
     std.debug.assert(bytes.len > 0);
     var slice = bytes;
+
+    var out = std.ArrayList(u8).init(allocator);
+    errdefer out.deinit();
 
     while (slice.len > 0) {
         if (slice.len < 4) break;
