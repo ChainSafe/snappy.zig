@@ -75,8 +75,13 @@ pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![
 ///
 /// Caller owns the returned memory.
 pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressError!?[]const u8 {
-    std.debug.assert(bytes.len > 0);
-    var slice = bytes;
+    std.debug.assert(bytes.len > IDENTIFIER_FRAME.len);
+    // Start of stream always starts with the `IDENTIFIER_FRAME`.
+    if (!std.mem.eql(u8, bytes[0..IDENTIFIER_FRAME.len], &IDENTIFIER_FRAME)) {
+        return UncompressError.BadIdentifier;
+    }
+
+    var slice = bytes[IDENTIFIER_FRAME.len..];
 
     var out = std.ArrayList(u8).init(allocator);
     errdefer out.deinit();
@@ -90,11 +95,6 @@ pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressErr
         slice = slice[4 + frame_size ..];
 
         switch (chunk_type) {
-            .identifier => {
-                if (!std.mem.eql(u8, frame, &IDENTIFIER)) {
-                    return UncompressError.BadIdentifier;
-                }
-            },
             .compressed => {
                 const checksum = frame[0..4];
                 const compressed = frame[4..];
@@ -114,7 +114,13 @@ pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressErr
                 if (crc(uncompressed) != std.mem.bytesToValue(u32, checksum)) return UncompressError.BadChecksum;
                 try out.appendSlice(uncompressed);
             },
-            .padding, .skippable => continue,
+            .padding,
+            .skippable,
+            // The stream identifier chunk can come multiple times in the stream besides
+            // the first; if such a chunk shows up, it should simply be ignored, assuming
+            // it has the right length and contents.
+            .identifier,
+            => continue,
         }
     }
 
