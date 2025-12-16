@@ -87,7 +87,7 @@ Supports snappy frames compression and decompression.
 - `compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![]u8`: Frame `bytes` into Snappy chunks, choosing compressed payloads only
 when they are smaller than their uncompressed counterparts.
 
-- `uncompress(chunk: []const u8, out: *std.ArrayList(u8)) UncompressError!?[]const u8`: Parse framed Snappy data and return the uncompressed payload,
+- `uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressError!?[]const u8`: Parse framed Snappy data and return the uncompressed payload,
 or `null` if the frame explicitly signalled an empty buffer.
 
 ## License
