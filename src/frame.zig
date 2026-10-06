@@ -57,7 +57,7 @@ pub fn compress(allocator: std.mem.Allocator, bytes: []const u8) CompressError![
         const chunk_type: ChunkType = if (use_compressed) .compressed else .uncompressed;
         const frame_size = payload.len + 4;
 
-        var header: [4]u8 = .{ @intFromEnum(chunk_type), 0, 0, 0 };
+        var header: [4]u8 = .{ @backingInt(chunk_type), 0, 0, 0 };
         std.mem.writeInt(u24, header[1..4], @intCast(frame_size), .little);
         try out.appendSlice(allocator, &header);
 
@@ -88,7 +88,7 @@ pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressErr
 
     while (slice.len > 0) {
         if (slice.len < 4) break;
-        const chunk_type: ChunkType = @enumFromInt(slice[0]);
+        const chunk_type: ChunkType = @fromBackingInt(slice[0]);
 
         const frame_size: usize = @intCast(std.mem.readInt(u24, slice[1..4], .little));
         const frame = slice[4 .. 4 + frame_size];
@@ -131,7 +131,7 @@ pub fn uncompress(allocator: std.mem.Allocator, bytes: []const u8) UncompressErr
 
 /// Masked CRC32C hash used by the Snappy framing format.
 fn crc(b: []const u8) u32 {
-    const c = std.hash.crc.Crc32Iscsi;
+    const c = std.hash.crc.@"CRC-32/ISCSI";
     const hash = c.hash(b);
     return @as(u32, hash >> 15 | hash << 17) +% 0xa282ead8;
 }

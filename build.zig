@@ -52,10 +52,21 @@ pub fn build(b: *std.Build) void {
     lib.installHeader(snappy_stubs_public_h.getOutputFile(), "snappy-stubs-public.h");
     b.installArtifact(lib);
 
+    const translate_c = b.addTranslateC(.{
+        .root_source_file = upstream.path("snappy-c.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    translate_c.addIncludePath(upstream.path("."));
+    translate_c.addConfigHeader(snappy_stubs_public_h);
+
     const module = b.addModule("snappy", .{
         .root_source_file = b.path("src/snappy.zig"),
         .target = target,
         .optimize = optimize,
+        .imports = &.{
+            .{ .name = "c", .module = translate_c.createModule() },
+        },
     });
     module.linkLibrary(lib);
 
