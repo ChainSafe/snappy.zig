@@ -1,6 +1,4 @@
-const c = @cImport({
-    @cInclude("snappy-c.h");
-});
+const c = @import("snappy_c");
 
 pub const Error = error{
     invalid_input,
