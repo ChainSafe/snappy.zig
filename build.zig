@@ -1,4 +1,5 @@
 const std = @import("std");
+const Translator = @import("translate_c").Translator;
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -58,13 +59,13 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     module.linkLibrary(lib);
-    const headers = b.addTranslateC(.{
-        .root_source_file = upstream.path("snappy-c.h"),
+    const headers: Translator = .init(b.dependency("translate_c", .{}), .{
+        .c_source_file = upstream.path("snappy-c.h"),
         .target = target,
         .optimize = optimize,
     });
     headers.addConfigHeader(snappy_stubs_public_h);
-    module.addImport("snappy_c", headers.createModule());
+    module.addImport("snappy_c", headers.mod);
 
     const test_snappy = b.addTest(.{
         .name = "snappy",
